@@ -1,0 +1,43 @@
+
+// Ejemplo con arrays de 4 dimensiones: Inicialización y acceso
+
+intX main() {
+
+    listX<listX<listX<listX<intX>[2]>[2]>[4]>[3] lista = 
+        [ 
+            [ 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] 
+            ] ,
+            [ 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] 
+            ] , 
+            [ 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] , 
+                [ [1, 2], [3, 4] ] 
+            ]
+        ];
+
+    intX total = 0;
+
+    for(intX i = 0; i < 3; i = i + 1) {
+        for(intX j = 0; j < 4; j = j + 1) {
+            for (intX k = 0; k < 2; k = k + 1) {
+                for(intX l = 0; l < 2; l = l + 1) {
+                    total = total + lista[i][j][k][l];
+                }
+            }
+        }
+    }
+
+    writeX(total);
+
+    return 0;
+}

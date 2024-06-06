@@ -1,0 +1,41 @@
+intX binarySearch(listX<intX>[50] lista, intX ini, intX fin, intX buscado) {
+
+    intX index;
+
+    if(ini >= fin) {
+        index = -1;
+    }
+    otherwise {
+        if(ini equals fin - 1) {
+            if(lista[ini] equals buscado) {
+                index = ini;
+            }
+            otherwise {
+                index = -1;
+            }
+        }
+        otherwise {
+            intX m = (ini + fin - 1) / 2;
+            if(lista[m] < buscado) {
+                index = binarySearch(lista, m + 1, fin, buscado);
+            }
+            otherwise {
+                index = binarySearch(lista, ini, m + 1, buscado);
+            }
+        }
+    }
+
+    return index;
+}
+
+intX main() {
+
+    listX<intX>[50] lista;
+    for(intX i = 0; i < 50; i = i + 1) {
+        lista[i] = i;
+    }
+
+    writeX(binarySearch(lista, 0, 50, 0));
+
+    return 0;
+}

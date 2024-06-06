@@ -1,0 +1,72 @@
+structX Index {
+    intX ini    //Error. Falta ;
+    intX fin;
+};
+
+intX var_global  0;     //Error en la declaracion
+
+intX max_rec(listX<intX>[10] &lista Index ind) {    //Error en los parametros. Falta una ,
+
+    intX maximum;
+
+    if(ind->fin  ind->ini equals 2) {   //Error en la condicion del If
+        if(lista[ind->ini] < lista[ind->ini + 1]) {
+            maximum = lista[ind->ini + 1];
+        }
+        otherwise {
+            maximum = lista[ind->ini];
+        }
+    }
+
+    return maximum;
+}
+
+intX max_while(listX<intX>[10] lista) {
+
+    intX i = 1;
+    maximum = lista[0];
+    while(i  10) {      //Error en la condicion del While
+        if(lista[i] > maximum) {
+            maximum = lista[i];
+        }
+
+        i = i + 1;
+    }
+
+    return maximum      //Error. Falta ; en la instruccion return
+}
+
+intX max_for(listX<intX>[10] &lista) {
+
+    intX maximum = lista[0];
+
+    for(intX i  i < 10; i = i + 1) {        //Error en la declaracion del For
+        if(lista[i] > maximum) {
+            maximum = lista[i];
+        }
+    }
+
+    return maximum;
+}
+
+intX main(intX i) {
+    listX<intX>[10] lista = [1, 4, 6, 8, 2, 9, 24, 1, -33, -1];
+    Index ind;
+    ind->ini = 0;
+    ind->fin = 10;
+
+    readIntX(ind->fin + 3);     //Error en el argumento del read
+
+    intX maximum_rec = max_rec(lista, ind);
+    intX maximum_while = max_while(lista);
+    intX maximum_for = max_for(lista);
+
+    if(maximum_rec not_equals maximum_while or maximum_rec not_equals maximum_for or maximum_while not_equals maximum_for) {
+        writeX(0);
+    }
+    otherwise {
+        writeX(1);
+    }
+
+    return 0;
+}

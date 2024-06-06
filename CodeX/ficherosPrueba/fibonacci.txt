@@ -1,0 +1,28 @@
+voidX fibonacciRec(intX n, intX primero, intX segundo) {
+    
+    if(n > 0) {
+        intX siguiente = primero + segundo;
+        writeX(siguiente);
+        fibonacciRec(n - 1, segundo, siguiente);
+    }
+
+    return;
+}
+
+voidX fibonacci(intX n) {
+    writeX(0);
+    writeX(1);
+    fibonacciRec(n - 2, 0, 1);
+
+    return;
+}
+
+intX main() {
+
+    intX n;
+    readIntX(n);
+    
+    fibonacci(n);
+
+    return 0;
+}

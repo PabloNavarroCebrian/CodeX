@@ -1,0 +1,43 @@
+intX powRec(intX base, intX exp) {
+
+    intX result;
+
+    if(exp < 0) {
+        result = 0;
+    }
+    otherwise {
+        if(exp equals 0) {
+            result = 1;
+        }
+        otherwise {
+            if(exp % 2 equals 0) {
+                result = powRec(base, exp / 2);
+                result = result * result;
+            }
+            otherwise {
+                result = powRec(base, (exp - 1) / 2);
+                result = result * result;
+                result = result * base;
+            }
+        }
+    }
+
+    return result;
+}
+
+intX main() {
+
+    intX base;
+    intX exp;
+    intX n;
+
+    readIntX(n);
+
+    for(intX i = 0; i < n; i = i + 1) {
+        readIntX(base);
+        readIntX(exp);
+        writeX(powRec(base, exp));
+    }
+
+    return 0;
+}

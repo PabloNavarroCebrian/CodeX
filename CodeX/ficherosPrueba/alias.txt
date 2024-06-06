@@ -1,0 +1,35 @@
+
+aliasX ent = intX;
+
+structX Pair {
+    ent first;
+    intX second;
+};
+
+aliasX lista10Pairs = listX<Pair>[10];
+
+aliasX punteroALista = lista10Pairs*;
+
+intX main() {
+
+    lista10Pairs lista = [{0, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9, 9}];
+
+    boolX comprobar = True;
+
+    for(intX i = 0; i < 10; i = i + 1) {
+        comprobar = comprobar and (lista[i]->first equals i) and (lista[i]->second equals i);
+    }
+
+    writeX(comprobar);
+
+    comprobar = True;
+    punteroALista p = &lista;
+
+    for(intX i = 0; i < 10; i = i + 1) {
+        comprobar = comprobar and (*p[i]->first equals i) and (*p[i]->second equals i);
+    }
+
+    writeX(comprobar);
+
+    return 0;
+}

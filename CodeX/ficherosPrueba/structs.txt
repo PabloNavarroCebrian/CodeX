@@ -1,0 +1,32 @@
+structX struct1 {
+    intX elem1;
+    boolX elem2;
+};
+
+structX struct2 {
+    struct1 s1;
+    struct1 s2;
+};
+
+intX main() {
+
+    struct2 s = {{1, True}, {2, False}};
+
+    writeX(s->s1->elem1);
+    if(s->s1->elem2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    writeX(s->s2->elem1);
+    if(s->s2->elem2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    return 0;
+}

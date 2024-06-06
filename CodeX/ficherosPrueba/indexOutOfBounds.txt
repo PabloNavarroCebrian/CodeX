@@ -1,0 +1,7 @@
+intX main() {
+    
+    listX<intX>[2] lista = [0, 1];
+    writeX(lista[2]);
+    
+    return 0;
+}

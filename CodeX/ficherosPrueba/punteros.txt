@@ -1,0 +1,10 @@
+intX main() {
+
+    intX* intPointer = new intX;
+    
+    readIntX(*intPointer);
+
+    writeX(*intPointer);
+
+    return 0;
+}

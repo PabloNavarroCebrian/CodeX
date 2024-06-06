@@ -1,0 +1,9 @@
+intX main() {
+
+    intX num;
+
+    readIntX(num);
+    writeX(num);
+
+    return 0;
+}

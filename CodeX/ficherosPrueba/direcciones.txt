@@ -1,0 +1,16 @@
+intX main() {
+
+    intX num = 4;
+
+    intX* punteroNum = &num;
+    
+    writeX(num);
+    writeX(*punteroNum);
+
+    *punteroNum = 6;
+
+    writeX(num);
+    writeX(*punteroNum);
+
+    return 0;
+}

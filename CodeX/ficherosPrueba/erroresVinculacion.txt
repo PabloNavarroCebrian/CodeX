@@ -1,0 +1,62 @@
+structX Coche {
+    intX velocidad;
+    boolX puertas_5;
+};
+
+intX num = 3;
+intX num2;
+boolX bool = True;
+boolX bool2;
+listX<intX>[10] lista;
+
+structX Pair {
+    intX first;
+    intX second;
+};
+
+Pair index = {0, 0};
+
+intX* dir = &num;
+intX* pointer = new intX;
+
+Pair* pair_pointer = new Pair;
+
+structX StructPointers {
+    intX* pointer1;
+    intX* pointer2;
+};
+
+intX main() {
+
+    //Al descomentar una línea de las comentadas saltará el error de vinculacion
+    
+    //num2 = modificarValorNum(num2); //modificarValorNum no definido
+    num = num + num2;
+    bool2 = not bool;
+    lista = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    index->first = 2;
+    *dir = 4;
+    *pointer = 3;
+    *pair_pointer->first = 2;
+
+    StructPointers sp = {new intX, new intX};
+    *(sp->pointer1) = 3;
+    *(sp->pointer2) = 5;
+
+    listX<StructPointers>[2] listaStructsPunteros = [{new intX, new intX}, {new intX, new intX}];
+
+    *(listaStructsPunteros[0 + 1]->pointer1) = 3;
+
+
+    //concesionario[2]->velocidad = concesionario[0]->velocidad; //Concesionario no definido
+    //concesionario[0]->puertas_5 = False; //Concesionario no definido
+
+    DosListas dosListas = {[True, False, True], [1, 2, 3]}; //Tipo DosListas no definido 
+
+    dosListas->listaBoolX[2] = dosListas->listaBoolX[1];
+
+    listX<intX*>[3] listaPointers = [new intX, new intX, new intX];
+    *(listaPointers[0]) = 0;
+
+    return 0;
+}

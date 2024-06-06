@@ -1,0 +1,46 @@
+intX dec1 = 4;
+boolX dec2 = True;
+
+structX decStruct {
+    intX d1;
+    boolX d2;
+};
+
+decStruct dec3;
+
+intX main() {
+
+    dec3->d1 = 2;
+    dec3->d2 = False;
+
+    writeX(dec1);
+    if(dec2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    writeX(dec3->d1);
+    if(dec3->d2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    intX dec4;
+    dec4 = 3;
+    boolX dec5;
+    dec5 = True;
+
+    writeX(dec4);
+    if(dec5) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    return 0;
+}

@@ -1,0 +1,410 @@
+package ast;
+
+import java_cup.runtime.*;
+import alex.AnalizadorLexico;
+import alex.UnidadLexica;
+import alex.TokenValue;
+import errors.GestionErrores;
+import java.util.ArrayList;
+import ast.*;
+import ast.Expresiones.*;
+import ast.Tipos.*;
+import ast.Instrucciones.*;
+import ast.Expresiones.Accesos.*;
+import ast.Declaraciones.*;
+
+scan with {: return getScanner().next_token(); :};
+parser code {: 
+   private GestionErrores errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+init with {: 
+   errores = new GestionErrores();
+   AnalizadorLexico alex = (AnalizadorLexico)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+
+
+terminal     TRUE, FALSE, SUMA, RESTA, AST, DIV,
+             MOD, OR, AND, EQ, NOTEQ, MAYOR, MENOR, MAYEQ, MENEQ, NOT, PAP, PCIERRE, CAP, CCIERRE, LAP, LCIERRE, IGUAL, COMA, PUNTOCOMA,
+             FLECHA, AMPERSAND, LISTX, STRUCTX, INTX, BOOLX, VOIDX, NEW, RETURN, IF, ELSE, WHILE, FOR, MAIN, READ, WRITE, ALIAS;
+
+terminal TokenValue ENT, ID;
+
+non terminal Programa PROG;
+non terminal Declaracion DEC;
+non terminal DecVar DECVAR;
+non terminal DecStruct DECSTRUCT;
+non terminal ArrayList<DecVar> DECSOFSTRUCT;
+non terminal DecFuncion DECFUN;
+non terminal ArrayList<Parametro> PARAMS;
+non terminal ArrayList<Parametro> MANYPARAMS;
+non terminal Parametro PARAM;
+non terminal DecAlias DECALIAS;
+non terminal Type TIPO;
+non terminal DecFuncion FUNMAIN;
+non terminal ArrayList<Instruction> BLOQUE;
+non terminal ArrayList<Instruction> LISTAINST;
+non terminal Instruction INST;
+non terminal IfInst IFINST;
+non terminal ForInst FORINST;
+non terminal WhileInst WHILEINST;
+non terminal DecVarInst DECVARINST;
+non terminal AsigInst ASIGINST;
+non terminal ReturnInst RETINST;
+non terminal ReadInst READINST;
+non terminal WriteInst WRITEINST;
+non terminal LlamadaFunInst LLAMADAFUN;
+non terminal ExpLlamadaFun LLAMADAFUNEXP;
+non terminal ArrayList<E> ARGS;
+non terminal ArrayList<E> MANYARGS;
+non terminal E EXP;
+non terminal E E1;
+non terminal E E2;
+non terminal E E3;
+non terminal E E4;
+non terminal E E5;
+non terminal E E6;
+non terminal E E7;
+non terminal Acceso ACCESO;
+non terminal Acceso ACCESO0;
+non terminal KindE OP0;
+non terminal KindE OP1;
+non terminal KindE OP2;
+non terminal KindE OP3;
+non terminal ExpArray EXPARRAY;
+non terminal ArrayList<E> MANYELEMSARRAY;
+non terminal ExpStruct EXPSTRUCT;
+non terminal ArrayList<E> MANYELEMSSTRUCT;
+
+
+PROG ::= DEC:dec PROG:p 
+            {: p.addDec(dec); RESULT = p; :}
+       | FUNMAIN:funMain
+            {: RESULT = new Programa(funMain); :}
+       | error
+            {: System.out.println("ERROR: No se ha definido la funcion Main"); :};
+
+
+DEC ::= DECVAR:d
+         {: RESULT = d; :}
+      | DECSTRUCT:d
+         {: RESULT = d; :}
+      | DECFUN:d
+         {: RESULT = d; :}
+      | DECALIAS:d 
+         {: RESULT = d; :};
+
+DECVAR ::= TIPO:t ID:iden IGUAL EXP:e PUNTOCOMA
+            {: RESULT = new DecVar(t, iden.lexema, e); :}
+         | TIPO:t ID:iden PUNTOCOMA 
+            {: RESULT = new DecVar(t, iden.lexema); :}
+         | TIPO ID error PUNTOCOMA
+            {: System.out.println("ERROR: Error en la declaracion"); :}
+         | TIPO ID error
+            {: System.out.println("ERROR: Falta ; al final de la declaracion"); :}
+         | TIPO:t ID:iden IGUAL EXP:e error
+            {: System.out.println("ERROR: Falta ; al final de la declaracion"); :};
+
+
+DECSTRUCT ::= STRUCTX ID:iden LAP DECSOFSTRUCT:campos LCIERRE PUNTOCOMA 
+               {: RESULT = new DecStruct(iden.lexema, campos); :}
+            | STRUCTX ID LAP DECSOFSTRUCT LCIERRE error
+               {: System.out.println("ERROR: Falta ; al final de la declaracion del StructX"); :}
+            | STRUCTX ID error DECSOFSTRUCT LCIERRE PUNTOCOMA
+               {: System.out.println("ERROR: Falta llave de apertura del StructX"); :};
+
+DECSOFSTRUCT ::= TIPO:t ID:iden PUNTOCOMA DECSOFSTRUCT:listaCampos
+                  {: listaCampos.add(new DecVar(t, iden.lexema)); RESULT = listaCampos; :}
+               | 
+                  {: RESULT = new ArrayList<DecVar>(); :}
+               | TIPO ID error
+                  {: System.out.println("ERROR: Falta ; en alguna declaracion del StructX"); RESULT = new ArrayList<DecVar>(); :};
+
+
+DECFUN ::= TIPO:t ID:iden PARAMS:listaParams BLOQUE:listaInst
+            {: RESULT = new DecFuncion(t, iden.lexema, listaParams, listaInst); :};
+
+PARAMS ::= PAP MANYPARAMS:listaParams
+            {: RESULT = listaParams; :}
+         | PAP PCIERRE 
+            {: RESULT = new ArrayList<Parametro>(); :}
+         | PAP error PCIERRE
+            {: System.out.println("ERROR: Error en los parametros de la funcion"); RESULT = new ArrayList<Parametro>(); :};
+
+MANYPARAMS ::= PARAM:param COMA MANYPARAMS:listaParams
+                  {: listaParams.add(param); RESULT = listaParams; :}
+             | PARAM:param PCIERRE 
+                  {: ArrayList<Parametro> listaParams = new ArrayList<Parametro>(); listaParams.add(param); RESULT = listaParams; :};
+
+PARAM ::= TIPO:t AMPERSAND ID:iden
+            {: RESULT = new Parametro(t, Boolean.FALSE, iden.lexema); :}
+        | TIPO:t ID:iden 
+            {: RESULT = new Parametro(t, Boolean.TRUE, iden.lexema); :};
+
+DECALIAS ::= ALIAS ID:iden IGUAL TIPO:t PUNTOCOMA
+               {: RESULT = new DecAlias(iden.lexema, t); :};
+
+
+//---------------Tipos---------------
+TIPO ::= INTX 
+         {: RESULT = new IntXType(); :}
+       | BOOLX  
+         {: RESULT = new BoolXType(); :}
+       | VOIDX  
+         {: RESULT = new VoidXType(); :}
+       | LISTX MENOR TIPO:t MAYOR CAP ENT:ent CCIERRE  
+         {: RESULT = new ListXType(t, new Ent(ent.lexema)); :}
+       | ID:iden
+         {: RESULT = new AliasXType(iden.lexema); :}
+       | TIPO:t AST 
+         {: RESULT = new PointerType(t); :};
+
+
+//---------------Programa principal---------------
+FUNMAIN ::= INTX MAIN PAP PCIERRE BLOQUE:listaInst
+               {: RESULT = new DecFuncion(new IntXType(), "main", new ArrayList<Parametro>(), listaInst); :}
+          | INTX MAIN PAP error PCIERRE BLOQUE 
+               {: System.out.println("ERROR: La funcion Main no puede recibir argumentos"); :};
+
+
+//---------------Bloques---------------
+BLOQUE ::= LAP LISTAINST:listaInst
+            {: RESULT = listaInst; :}
+         | LAP LCIERRE 
+            {: RESULT = new ArrayList<Instruction>(); :};
+
+LISTAINST ::= INST:inst LISTAINST:listaInst 
+               {: listaInst.add(inst); RESULT = listaInst; :}
+            | INST:inst LCIERRE
+               {: ArrayList<Instruction> listaInst = new ArrayList<Instruction>(); listaInst.add(inst); RESULT = listaInst; :};
+
+INST ::= IFINST:inst
+            {: RESULT = inst; :}
+       | FORINST:inst 
+            {: RESULT = inst; :}
+       | WHILEINST:inst 
+            {: RESULT = inst; :}
+       | DECVARINST:inst 
+            {: RESULT = inst; :}
+       | ASIGINST:inst 
+            {: RESULT = inst; :}
+       | RETINST:inst 
+            {: RESULT = inst; :}
+       | READINST:inst 
+            {: RESULT = inst; :}
+       | WRITEINST:inst 
+            {: RESULT = inst; :}
+       | LLAMADAFUN:inst 
+            {: RESULT = inst; :};
+
+
+//---------------Instrucciones---------------
+IFINST ::= IF PAP EXP:cond PCIERRE BLOQUE:listaInstIf ELSE BLOQUE:listaInstElse 
+            {: RESULT = new IfInst(cond, listaInstIf, listaInstElse); :}
+         | IF PAP EXP:cond PCIERRE BLOQUE:listaInstIf
+            {: RESULT = new IfInst(cond, listaInstIf); :}
+         | IF error BLOQUE
+            {: System.out.println("ERROR: Error en la condicion del If"); :}
+         | IF error BLOQUE ELSE BLOQUE
+            {: System.out.println("ERROR: Error en la condicion del If"); :};
+
+
+FORINST ::= FOR PAP TIPO:t ID:iden IGUAL EXP:e1 PUNTOCOMA EXP:cond PUNTOCOMA ACCESO:ac IGUAL EXP:e2 PCIERRE BLOQUE:listaInst
+               {: RESULT = new ForInst(new DecVarInst(t, iden.lexema, e1), cond, new AsigInst(ac, e2), listaInst); :}
+          | FOR PAP PUNTOCOMA EXP:cond PUNTOCOMA ACCESO:ac IGUAL EXP:e PCIERRE BLOQUE:listaInst
+               {: RESULT = new ForInst(cond, new AsigInst(ac, e), listaInst); :}
+          | FOR error BLOQUE
+               {: System.out.println("ERROR: Error en las condiciones del For"); :};
+
+
+WHILEINST ::= WHILE PAP EXP:cond PCIERRE BLOQUE:listaInst 
+               {: RESULT = new WhileInst(cond, listaInst); :}
+            | WHILE error BLOQUE
+               {: System.out.println("ERROR: Error en las condiciones del While"); :};
+
+
+DECVARINST ::= TIPO:t ID:iden IGUAL EXP:e PUNTOCOMA 
+                  {: RESULT = new DecVarInst(t, iden.lexema, e); :}
+             | TIPO:t ID:iden PUNTOCOMA 
+                  {: RESULT = new DecVarInst(t, iden.lexema); :}
+             | TIPO ID error
+                  {: System.out.println("ERROR: Error en la declaracion"); :};
+
+
+ASIGINST ::= ACCESO:ac IGUAL EXP:e PUNTOCOMA 
+               {: RESULT = new AsigInst(ac, e); :}
+             | ACCESO IGUAL EXP error
+               {: System.out.println("ERROR: Falta ; en la asignacion"); :};
+
+
+RETINST ::= RETURN EXP:e PUNTOCOMA 
+               {: RESULT = new ReturnInst(e); :}
+          | RETURN PUNTOCOMA
+               {: RESULT = new ReturnInst(); :}
+          | RETURN EXP error
+               {: System.out.println("ERROR: Falta ; en el RETURN"); :}
+          | RETURN error
+               {: System.out.println("ERROR: Falta ; en el RETURN"); :};
+
+
+READINST ::= READ PAP ACCESO:ac PCIERRE PUNTOCOMA
+               {: RESULT = new ReadInst(ac); :}
+            | READ error PUNTOCOMA
+               {: System.out.println("ERROR: Error en los argumentos de la instruccion Read"); :}
+            | READ PAP ACCESO PCIERRE error
+               {: System.out.println("ERROR: Falta ; en el Read"); :};
+
+
+WRITEINST ::= WRITE PAP EXP:e PCIERRE PUNTOCOMA 
+                  {: RESULT = new WriteInst(e); :}
+            | WRITE error PUNTOCOMA
+                  {: System.out.println("ERROR:  Error en los argumentos de la instruccion Write"); :}
+            | WRITE PAP EXP PCIERRE error
+                  {: System.out.println("ERROR: Falta ; en el Write"); :};
+
+
+
+LLAMADAFUN ::=  ID:iden ARGS:listArgs PUNTOCOMA 
+                  {: RESULT = new LlamadaFunInst(iden.lexema, listArgs); :}
+               | ID ARGS error
+                  {: System.out.println("ERROR: Falta ; en la llamada a la funcion"); :};
+
+ARGS ::= PAP MANYARGS:listArgs
+            {: RESULT = listArgs; :}
+       | PAP PCIERRE 
+            {: RESULT = new ArrayList<E>(); :}
+       | PAP error PCIERRE
+            {: System.out.println("Error en los argumentos de la llamada a funcion"); RESULT = new ArrayList<E>(); :};
+
+MANYARGS ::= EXP:e COMA MANYARGS:listaArgs
+               {: listaArgs.add(e); RESULT = listaArgs; :}
+           | EXP:e PCIERRE 
+               {: ArrayList<E> listaArgs = new ArrayList<E>(); listaArgs.add(e); RESULT = listaArgs; :};
+
+
+//---------------Expresiones---------------
+EXP ::= EXP:opnd1 OR E1:opnd2
+         {: RESULT = new EBin(opnd1, KindE.OR, opnd2); :}
+      | E1:e
+         {: RESULT = e; :};
+
+E1 ::= E1:opnd1 AND E2:opnd2
+         {: RESULT = new EBin(opnd1, KindE.AND, opnd2); :}
+      | E2:e
+         {: RESULT = e; :};
+
+E2 ::= E2:opnd1 EQ E3:opnd2
+         {: RESULT = new EBin(opnd1, KindE.EQ, opnd2); :}
+      | E2:opnd1 NOTEQ E3:opnd2
+         {: RESULT = new EBin(opnd1, KindE.NOTEQ, opnd2); :}
+      | E3:e
+         {: RESULT = e; :};
+
+E3 ::= E3:opnd1 OP0:op E4:opnd2
+         {: RESULT = new EBin(opnd1, op, opnd2); :}
+      | E4:e
+         {: RESULT = e; :}
+      | NEW TIPO:t         {: RESULT = new NewExp(t); :};
+
+E4 ::= E4:opnd1 OP1:op E5:opnd2
+         {: RESULT = new EBin(opnd1, op, opnd2); :}
+      | E5:e
+         {: RESULT = e; :};
+
+E5 ::= E5:opnd1 OP2:op E6:opnd2
+         {: RESULT = new EBin(opnd1, op, opnd2); :}
+      | E6:e
+         {: RESULT = e; :};
+
+E6 ::= OP3:op E6:opnd1
+         {: RESULT = new EUnaria(op, opnd1); :}
+      | E7:e
+         {: RESULT = e; :};
+
+E7 ::= ACCESO:ac
+         {: RESULT = ac; :}
+      | TRUE
+         {: RESULT = new Bool(Boolean.TRUE); :}
+      | FALSE
+         {: RESULT = new Bool(Boolean.FALSE); :}
+      | ENT: ent
+         {: RESULT = new Ent(ent.lexema); :}
+      | PAP EXP:e PCIERRE 
+         {: RESULT = e; :}
+      | EXPARRAY:e
+         {: RESULT = e; :}
+      | EXPSTRUCT:e
+         {: RESULT = e; :}
+      | LLAMADAFUNEXP:e
+         {: RESULT = e; :};
+
+
+ACCESO ::= ACCESO:ac CAP EXP:index CCIERRE 
+            {: RESULT = new AccesoArray(ac, index); :}
+         | ACCESO:ac FLECHA ID:campo
+            {: RESULT = new AccesoStruct(ac, campo.lexema); :}
+         | ACCESO0:ac
+            {: RESULT = ac; :};
+
+ACCESO0 ::= ID:iden
+            {: RESULT = new AccesoVar(iden.lexema); :}
+          | AST ACCESO0:ac
+            {: RESULT = new AccesoPointer(ac); :} 
+          | AMPERSAND ACCESO0:ac
+            {: RESULT = new AccesoDir(ac); :}
+          | AST PAP ACCESO:ac PCIERRE 
+            {: RESULT = new AccesoPointer(ac); :}
+          | AMPERSAND PAP ACCESO:ac PCIERRE 
+            {: RESULT = new AccesoDir(ac); :};
+
+
+EXPARRAY ::= CAP MANYELEMSARRAY:list
+               {: RESULT = new ExpArray(list); :}
+            | CAP CCIERRE
+               {: RESULT = new ExpArray(new ArrayList<E>()); :};
+
+MANYELEMSARRAY ::= EXP:e COMA MANYELEMSARRAY:list
+                     {: list.add(e); RESULT = list; :}
+                  | EXP:e CCIERRE
+                     {: ArrayList<E> list = new ArrayList<E>(); list.add(e); RESULT = list; :};
+
+
+EXPSTRUCT ::= LAP MANYELEMSSTRUCT:list
+               {: RESULT = new ExpStruct(list); :}
+            | LAP LCIERRE
+               {: RESULT = new ExpStruct(new ArrayList<E>()); :};
+
+MANYELEMSSTRUCT ::= EXP:e COMA MANYELEMSSTRUCT:list
+                     {: list.add(e); RESULT = list; :}
+                  | EXP:e LCIERRE
+                     {: ArrayList<E> list = new ArrayList<E>(); list.add(e); RESULT = list; :};
+
+LLAMADAFUNEXP ::= ID:iden ARGS:listArgs
+                     {: RESULT = new ExpLlamadaFun(iden.lexema, listArgs); :};
+
+OP0 ::= MAYOR
+         {: RESULT = KindE.MAYOR; :}
+      | MENOR
+         {: RESULT = KindE.MENOR; :}
+      | MAYEQ
+         {: RESULT = KindE.MAYEQ; :}
+      | MENEQ 
+         {: RESULT = KindE.MENEQ; :};
+
+OP1 ::= SUMA
+         {: RESULT = KindE.SUMA; :}
+      | RESTA 
+         {: RESULT = KindE.RESTA; :};
+OP2 ::= AST 
+         {: RESULT = KindE.MUL; :}
+      | DIV
+         {: RESULT = KindE.DIV; :}
+      | MOD
+         {: RESULT = KindE.MOD; :};
+OP3 ::= NOT
+         {: RESULT = KindE.NOT; :}
+      | RESTA 
+         {: RESULT = KindE.MENOS; :};

@@ -1,0 +1,14 @@
+intX main() {
+
+    listX<intX>[10]* lista = new listX<intX>[10];
+
+    for(intX i = 0; i < 10; i = i + 1) {
+        *lista[i] = i;
+    }
+
+    for(intX i = 0; i < 10; i = i + 1) {
+        writeX(*lista[i]);
+    }
+
+    return 0;
+}

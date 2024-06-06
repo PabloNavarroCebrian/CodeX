@@ -1,0 +1,80 @@
+intX main() {
+    intX num1 = 3;
+    intX num2 = 5;
+
+    if(num1 < num2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(num2 > num1) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(num1 <= num2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(num2 >= num1) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(num2 equals num1) {
+        writeX(0);
+    }
+    otherwise {
+        writeX(1);
+    }
+
+    
+    if(num2 not_equals num1) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    writeX(num1 + num2);
+    writeX(num1 - num2);
+    writeX(num1 * num2);
+    writeX(num2 / num1);
+    writeX(num2 % num1);
+    writeX(-3 + 4 * 5 / (3 - 2) - 20 % 5);
+
+    boolX bool1 = True;
+    boolX bool2 = False;
+
+    if(not bool2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(bool1 or bool2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    if(bool1 and not bool2) {
+        writeX(1);
+    }
+    otherwise {
+        writeX(0);
+    }
+
+    return 0;
+}
